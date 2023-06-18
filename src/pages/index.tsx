@@ -55,7 +55,7 @@ const Home = () => {
   // 10 石＋旗
   // 11 bomb
   const newBombMap: number[][] = JSON.parse(JSON.stringify(bombMap));
-  const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
+  const newUserInputs: (0 | 1 | 2 | 3)[][] = JSON.parse(JSON.stringify(userInputs));
   const isPlaying = userInputs.some((row) => row.some((input) => input !== 0));
   const isFailure = userInputs.some((row, y) =>
     row.some((input, x) => input === 1 && bombMap[y][x] === 1)
@@ -122,29 +122,22 @@ const Home = () => {
   };
 
   return (
-    <>
-      <div
-        className={styles.face}
-        onClick={() => onClick()}
-        style={{ backgroundPosition: 1 * -30 + 30 }}
-      />
-      <div className={styles.container}>
-        <div className={styles.board}>
-          {board.map((row, y) =>
-            row.map((color, x) => (
-              <div
-                className={styles.bomb}
-                key={`${x}-${y}`}
-                onClick={() => onClick(x, y)}
-                style={{ backgroundPosition: color * -30 + 30 }}
-              >
-                {color === -1 && <div className={styles.stone} />}
-              </div>
-            ))
-          )}
-        </div>
+    <div className={styles.container}>
+      <div className={styles.board}>
+        {board.map((row, y) =>
+          row.map((color, x) => (
+            <div
+              className={styles.bomb}
+              key={`${x}-${y}`}
+              onClick={() => onClick(x, y)}
+              style={{ backgroundPosition: color * -30 + 30 }}
+            >
+              {color === -1 && <div className={styles.stone} />}
+            </div>
+          ))
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
