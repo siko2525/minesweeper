@@ -1,58 +1,150 @@
+import { useState } from 'react';
 import styles from './index.module.css';
 
 const Home = () => {
+  const [userInputs, setUserInputs] = useState<(0 | 1 | 2 | 3)[][]>([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
+
+  const [bombMap, setBombMap] = useState([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
+
+  const board = [
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+  ];
+
+  const directions = [
+    [-1, 0],
+    [-1, -1],
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+  ];
+  // -1 = 石
+  // 0 = 画像なしセル
+  // 1~8 画像セル
+  // 9 石＋はてな
+  // 10 石＋旗
+  // 11 bomb
+  const newBombMap: number[][] = JSON.parse(JSON.stringify(bombMap));
+  const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
+  const isPlaying = userInputs.some((row) => row.some((input) => input !== 0));
+  const isFailure = userInputs.some((row, y) =>
+    row.some((input, x) => input === 1 && bombMap[y][x] === 1)
+  );
+  const setBomb = (x: number, y: number) => {
+    for (let bombCount = 0; bombCount < 10; bombCount++) {
+      const randomBombY = Math.floor(Math.random() * 9);
+      const randomBombX = Math.floor(Math.random() * 9);
+      if (newBombMap[randomBombY][randomBombX] !== 1 && (randomBombX !== x || randomBombY !== y)) {
+        newBombMap[randomBombY][randomBombX] = 1;
+      } else {
+        bombCount--;
+      }
+    }
+  };
+
+  const checkAround = (x: number, y: number) => {
+    let bombCount = 0;
+    for (const dir of directions) {
+      if (board[y + dir[1]] !== undefined && board[y + dir[1]][x + dir[0]] !== undefined) {
+        bombCount += bombMap[y + dir[1]][x + dir[0]];
+      }
+    }
+    board[y][x] = bombCount;
+    if (bombCount === 0) {
+      for (const dir of directions) {
+        if (board[y + dir[1]] !== undefined && board[y + dir[1]][x + dir[0]] === -1) {
+          checkAround(x + dir[0], y + dir[1]);
+        }
+      }
+    }
+  };
+
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      if (userInputs[y][x] === 1) {
+        if (bombMap[y][x] === 1) {
+          board[y][x] = 11;
+          console.log('nya');
+        } else {
+          checkAround(x, y);
+        }
+      }
+    }
+  }
+
+  const onClick = (x: number, y: number) => {
+    console.log(x, y);
+    newUserInputs[y][x] = 1;
+    setUserInputs(newUserInputs);
+    if (!isPlaying) {
+      setBomb(x, y);
+    }
+    let BombExist = false;
+    for (const row of bombMap) {
+      for (const cell of row) {
+        if (cell === 1) {
+          BombExist = true;
+          break;
+        }
+      }
+    }
+    setBombMap(newBombMap);
+  };
+
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            pages/index.js
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
+    <>
+      <div
+        className={styles.face}
+        onClick={() => onClick()}
+        style={{ backgroundPosition: 1 * -30 + 30 }}
+      />
+      <div className={styles.container}>
+        <div className={styles.board}>
+          {board.map((row, y) =>
+            row.map((color, x) => (
+              <div
+                className={styles.bomb}
+                key={`${x}-${y}`}
+                onClick={() => onClick(x, y)}
+                style={{ backgroundPosition: color * -30 + 30 }}
+              >
+                {color === -1 && <div className={styles.stone} />}
+              </div>
+            ))
+          )}
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
