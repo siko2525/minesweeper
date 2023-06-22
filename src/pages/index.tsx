@@ -103,7 +103,7 @@ const Home = () => {
     }
   }
 
-  
+  //爆弾をクリックしたら全部表示させる
   if (isFailure) {
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -131,18 +131,6 @@ const Home = () => {
       }
     }
     setBombMap(newBombMap);
-  };
-
-  const rightClick = (x: number, y: number, event: React.MouseEvent) => {
-    const newUserInput: number[][] = JSON.parse(JSON.stringify(userInput));
-    event.preventDefault(); // デフォルトの右クリックメニューを無効化
-    console.log('Right click is triggered');
-    if (userInput[y][x] !== 10) {
-      newUserInput[y][x] = 10;
-    } else {
-      newUserInput[y][x] = -1;
-    }
-    setUserInput(newUserInput);
   };
 
   return (
