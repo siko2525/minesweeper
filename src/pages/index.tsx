@@ -60,6 +60,7 @@ const Home = () => {
   const isFailure = userInputs.some((row, y) =>
     row.some((input, x) => input === 1 && bombMap[y][x] === 1)
   );
+  //bomb設置
   const setBomb = (x: number, y: number) => {
     for (let bombCount = 0; bombCount < 10; bombCount++) {
       const randomBombY = Math.floor(Math.random() * 9);
@@ -71,7 +72,7 @@ const Home = () => {
       }
     }
   };
-
+  //数字表示
   const checkAround = (x: number, y: number) => {
     let bombCount = 0;
     for (const dir of directions) {
@@ -88,7 +89,7 @@ const Home = () => {
       }
     }
   };
-
+  //bomb表示
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
       if (userInputs[y][x] === 1) {
@@ -102,6 +103,17 @@ const Home = () => {
     }
   }
 
+  
+  if (isFailure) {
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < 9; x++) {
+        if (bombMap[y][x] === 1) {
+          board[y][x] = 11;
+        }
+      }
+    }
+  }
+  //クリックしたらボムのマップをつくる
   const onClick = (x: number, y: number) => {
     console.log(x, y);
     newUserInputs[y][x] = 1;
@@ -119,6 +131,18 @@ const Home = () => {
       }
     }
     setBombMap(newBombMap);
+  };
+
+  const rightClick = (x: number, y: number, event: React.MouseEvent) => {
+    const newUserInput: number[][] = JSON.parse(JSON.stringify(userInput));
+    event.preventDefault(); // デフォルトの右クリックメニューを無効化
+    console.log('Right click is triggered');
+    if (userInput[y][x] !== 10) {
+      newUserInput[y][x] = 10;
+    } else {
+      newUserInput[y][x] = -1;
+    }
+    setUserInput(newUserInput);
   };
 
   return (

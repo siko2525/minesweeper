@@ -13,6 +13,7 @@
   height: 30px;
   background: url('~/assets/image/icons.png') no-repeat;
   background-position: -300px;
+  border: solid 1px rgb(85 85 85);
 }
 
 .board {
